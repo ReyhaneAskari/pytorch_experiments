@@ -59,10 +59,14 @@ class autoencoder(nn.Module):
     def __init__(self):
         super(autoencoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(28 * 28, 100),
-            nn.ReLU(True),)
+            nn.Linear(28 * 28, 256),
+            nn.ReLU(True),
+            nn.Linear(256, 64),
+            nn.ReLU(True))
         self.decoder = nn.Sequential(
-            nn.Linear(100, 28 * 28),
+            nn.Linear(64, 256),
+            nn.ReLU(True),
+            nn.Linear(256, 28 * 28),
             nn.Sigmoid())
 
     def forward(self, x):
@@ -97,7 +101,11 @@ for epoch in range(num_epochs):
     if epoch % 10 == 0:
         x = to_img(img.cpu().data)
         x_hat = to_img(output.cpu().data)
+        x_noisy = to_img(noisy_img.cpu().data)
+        weights = to_img(model.encoder[0].weight.cpu().data)
         save_image(x, './mlp_img/x_{}.png'.format(epoch))
         save_image(x_hat, './mlp_img/x_hat_{}.png'.format(epoch))
+        save_image(x_noisy, './mlp_img/x_noisy_{}.png'.format(epoch))
+        save_image(weights, './filters/epoch_{}.png'.format(epoch))
 
 torch.save(model.state_dict(), './sim_autoencoder.pth')
