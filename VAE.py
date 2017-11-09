@@ -16,7 +16,7 @@ def to_img(x):
     x = x.view(x.size(0), 1, 28, 28)
     return x
 
-num_epochs = 20
+num_epochs = 200
 batch_size = 128
 learning_rate = 1e-3
 
@@ -48,31 +48,38 @@ img_transform = transforms.Compose([
 dataset = MNIST('./data', transform=img_transform, download=True)
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-
-class autoencoder(nn.Module):
+class VariationalAutoencoder(nn.Module):
     def __init__(self):
-        super(autoencoder, self).__init__()
+        super(VariationalAutoencoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(28 * 28, 256),
+            nn.Linear(28 * 28, 400),
             nn.ReLU(True),
-            nn.Linear(256, 64),
-            nn.ReLU(True))
+            nn.Linear(400, 40))
         self.decoder = nn.Sequential(
-            nn.Linear(64, 256),
+            nn.Linear(20, 400),
             nn.ReLU(True),
-            nn.Linear(256, 28 * 28),
+            nn.Linear(400, 28 * 28),
             nn.Sigmoid())
 
+    def reparametrize(self, mu, logvar):
+        var = logvar.exp()
+        std = var.sqrt()
+        eps = Variable(torch.cuda.FloatTensor(std.size()).normal_())
+        return eps.mul(std).add(mu)
+
     def forward(self, x):
-        x = self.encoder(x)
-        x = self.decoder(x)
-        return x
+        h = self.encoder(x)
+        mu = h[:, :20]
+        logvar = h[:, 20:]
+        z = self.reparametrize(mu, logvar)
+        x_hat = self.decoder(z)
+        return x_hat, mu, logvar
 
 
-model = autoencoder().cuda()
-criterion = nn.BCELoss()
+model = VariationalAutoencoder().cuda()
+BCE = nn.BCELoss()
 optimizer = torch.optim.Adam(
-    model.parameters(), lr=learning_rate, weight_decay=1e-5)
+    model.parameters(), lr=learning_rate)
 
 for epoch in range(num_epochs):
     for data in dataloader:
@@ -80,20 +87,22 @@ for epoch in range(num_epochs):
         img = img.view(img.size(0), -1)
         img = Variable(img).cuda()
         # ===================forward=====================
-        output = model(img)
-        loss = criterion(output, img)
-        MSE_loss = nn.MSELoss()(output, img)
+        x_hat, mu, logvar = model(img)
+        NKLD = mu.pow(2).add(logvar.exp()).mul(-1).add(logvar.add(1))
+        KLD = torch.sum(NKLD).mul(-0.5)
+        KLD /= 128 * 784
+        loss = BCE(x_hat, img) + KLD
         # ===================backward====================
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
     # ===================log========================
-    print('epoch [{}/{}], loss:{:.4f}, MSE_loss:{:.4f}'
-          .format(epoch + 1, num_epochs, loss.data[0], MSE_loss.data[0]))
+    print('epoch [{}/{}], loss:{:.4f}'
+          .format(epoch + 1, num_epochs, loss.data[0]))
     if epoch % 10 == 0:
         x = to_img(img.cpu().data)
-        x_hat = to_img(output.cpu().data)
+        x_hat = to_img(x_hat.cpu().data)
         save_image(x, './mlp_img/x_{}.png'.format(epoch))
         save_image(x_hat, './mlp_img/x_hat_{}.png'.format(epoch))
 
-torch.save(model.state_dict(), './sim_autoencoder.pth')
+torch.save(model.state_dict(), './sim_variational_autoencoder.pth')
