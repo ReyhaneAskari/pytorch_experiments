@@ -75,6 +75,18 @@ class VariationalAutoencoder(nn.Module):
         x_hat = self.decoder(z)
         return x_hat, mu, logvar
 
+    def generation_with_interpolation(self, x_one, x_two, alpha):
+        hidden_one = self.encoder(x_one)
+        hidden_two = self.encoder(x_two)
+        mu_one = hidden_one[:, :20]
+        logvar_one = hidden_one[:, 20:]
+        mu_two = hidden_two[:, :20]
+        logvar_two = hidden_two[:, 20:]
+        mu = (1 - alpha) * mu_one + alpha * mu_two
+        logvar = (1 - alpha) * logvar_one + alpha * logvar_two
+        z = self.reparametrize(mu, logvar)
+        generated_image = self.decoder(z)
+        return generated_image
 
 model = VariationalAutoencoder().cuda()
 BCE = nn.BCELoss()
@@ -104,5 +116,17 @@ for epoch in range(num_epochs):
         x_hat = to_img(x_hat.cpu().data)
         save_image(x, './mlp_img/x_{}.png'.format(epoch))
         save_image(x_hat, './mlp_img/x_hat_{}.png'.format(epoch))
-
+        batch = iter(dataloader).next()[0]
+        batch = batch.view(batch.size(0), -1)
+        batch = Variable(batch).cuda()
+        x_one = batch[0:1]
+        x_two = batch[1:2]
+        generated_images = []
+        for alpha in torch.arange(0.0, 1.0, 0.1):
+            generated_images.append(model.generation_with_interpolation(
+                x_one, x_two, alpha))
+        generated_images = torch.cat(generated_images, 0).cpu().data
+        save_image(generated_images.view(-1, 1, 28, 28),
+                   './generated/output_interpolate_{}.png'.format(epoch),
+                   nrow=1)
 torch.save(model.state_dict(), './sim_variational_autoencoder.pth')
