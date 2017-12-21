@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 # Training settings
@@ -39,7 +38,6 @@ class Net(nn.Module):
         x = F.relu(F.max_pool2d(self.conv1(x), 3))
         x = F.relu(F.max_pool2d(self.conv2(x), 4))
         x = F.relu(F.max_pool2d(self.conv3(x), 4))
-        # import ipdb; ipdb.set_trace()
         x = x.view(-1, 4608)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
