@@ -52,12 +52,12 @@ def run_benchmark(args):
 
 if __name__ == '__main__':
     np.random.seed(12345678)
-    default_batch_size = 10000
-    default_nin = 2000
-    default_nout = 2000
-    default_nsteps = 1000
-    default_layers = 5
-    default_layer_neurons = 4000
+    default_batch_size = 4096
+    default_nin = 2048
+    default_nout = 2048
+    default_nsteps = 2000
+    default_layers = 100
+    default_layer_neurons = 2048
     parser = argparse.ArgumentParser()
     parser.add_argument('--mixf', action='store_true', default=False,
                         help='Enables mixed float precision')
