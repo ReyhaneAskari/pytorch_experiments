@@ -8,21 +8,21 @@ from torchvision import transforms
 from torchvision.datasets import MNIST
 from torchvision.utils import save_image
 
-if not os.path.exists('./mlp_img'):
-    os.mkdir('./mlp_img')
+if not os.path.exists('./DAEmlp_img'):
+    os.mkdir('./DAEmlp_img')
 
 
 def to_img(x):
     x = x.view(x.size(0), 1, 28, 28)
     return x
 
-num_epochs = 20
+num_epochs = 200
 batch_size = 128
 learning_rate = 1e-3
 
 
 def add_noise(img):
-    noise = torch.randn(img.size()) * 0.2
+    noise = torch.randn(img.size()) * 0.4
     noisy_img = img + noise
     return noisy_img
 
@@ -103,9 +103,9 @@ for epoch in range(num_epochs):
         x_hat = to_img(output.cpu().data)
         x_noisy = to_img(noisy_img.cpu().data)
         weights = to_img(model.encoder[0].weight.cpu().data)
-        save_image(x, './mlp_img/x_{}.png'.format(epoch))
-        save_image(x_hat, './mlp_img/x_hat_{}.png'.format(epoch))
-        save_image(x_noisy, './mlp_img/x_noisy_{}.png'.format(epoch))
+        save_image(x, './DAEmlp_img/x_{}.png'.format(epoch))
+        save_image(x_hat, './DAEmlp_img/x_hat_{}.png'.format(epoch))
+        save_image(x_noisy, './DAEmlp_img/x_noisy_{}.png'.format(epoch))
         save_image(weights, './filters/epoch_{}.png'.format(epoch))
 
-torch.save(model.state_dict(), './sim_autoencoder.pth')
+torch.save(model.state_dict(), './sim_dautoencoder.pth')

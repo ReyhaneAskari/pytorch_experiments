@@ -16,7 +16,7 @@ def to_img(x):
     x = x.view(x.size(0), 1, 28, 28)
     return x
 
-num_epochs = 20
+num_epochs = 200
 batch_size = 128
 learning_rate = 1e-3
 

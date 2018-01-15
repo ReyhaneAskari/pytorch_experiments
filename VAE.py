@@ -48,6 +48,7 @@ img_transform = transforms.Compose([
 dataset = MNIST('./data', transform=img_transform, download=True)
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
+
 class VariationalAutoencoder(nn.Module):
     def __init__(self):
         super(VariationalAutoencoder, self).__init__()
