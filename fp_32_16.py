@@ -70,7 +70,7 @@ def set_grad(params, params_with_grad):
 def train(epoch):
     model.train()
     # dummy dataset the same size as imagenet
-    data_ = torch.FloatTensor(np.random.randn(4096, 3, 2048, 2048))
+    data_ = torch.FloatTensor(np.random.randn(4096, 2048, 1, 1))
     target_ = torch.FloatTensor(np.random.randint(0, 128, (4096)))
     total_forward = 0
     for batch_idx in range(300):
@@ -86,6 +86,5 @@ def train(epoch):
         if batch_idx % 100 == 0:
             print('\tbatch_idx: ' + str(batch_idx))
     print(total_forward)
-
 for epoch in range(1, args.epochs + 1):
     train(epoch)
