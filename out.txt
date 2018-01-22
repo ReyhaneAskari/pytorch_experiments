@@ -1,0 +1,44 @@
+==146== NVPROF is profiling process 146, command: python fp_32_16.py
+	batch_idx: 0
+	batch_idx: 100
+	batch_idx: 200
+1.0285618305206299
+==146== Profiling application: python fp_32_16.py
+==146== Profiling result:
+            Type  Time(%)      Time     Calls       Avg       Min       Max  Name
+ GPU activities:   62.13%  1.57035s       300  5.2345ms  4.8927ms  5.5544ms  volta_scudnn_128x64_relu_interior_nn_v1
+                   35.01%  884.81ms       603  1.4673ms  1.4400us  3.3088ms  [CUDA memcpy HtoD]
+                    1.44%  36.313ms       300  121.04us  119.68us  123.14us  void add_tensor_kernel_v3<int=2, float, float, int=16, int=16, int=1, int=16, int=4>(cudnnTensorStruct, float*, cudnnTensorStruct, float const *, float, float)
+                    1.39%  35.246ms       300  117.49us  116.74us  118.62us  void kernelPointwiseApply2<ThresholdUpdateOutput<float>, float, float, unsigned int, int=-2, int=-2>(TensorInfo<ThresholdUpdateOutput<float>, float>, TensorInfo<float, float>, float, float)
+                    0.03%  781.28us       300  2.6040us  2.5600us  2.7520us  cudnn::gemm::computeOffsetsKernel(cudnn::gemm::ComputeOffsetsParams)
+                    0.00%     960ns         1     960ns     960ns     960ns  [CUDA memset]
+      API calls:   49.13%  3.36543s        12  280.45ms  11.568us  3.36314s  cudaMalloc
+                   36.13%  2.47512s       602  4.1115ms  15.294us  8.5905ms  cudaMemcpyAsync
+                   13.93%  954.19ms         8  119.27ms  24.437us  954.01ms  cudaStreamCreateWithFlags
+                    0.39%  26.837ms       602  44.579us  6.1980us  84.567us  cudaStreamSynchronize
+                    0.26%  17.723ms      1200  14.769us  8.5910us  37.295us  cudaLaunch
+                    0.05%  3.2636ms      9617     339ns     214ns  4.6070us  cudaGetDevice
+                    0.03%  1.9861ms         4  496.52us  468.49us  524.73us  cudaGetDeviceProperties
+                    0.02%  1.6143ms       900  1.7930us     442ns  9.9500us  cudaEventRecord
+                    0.01%  947.95us      3600     263ns      83ns  300.80us  cudaSetupArgument
+                    0.01%  858.53us       185  4.6400us     100ns  211.19us  cuDeviceGetAttribute
+                    0.01%  617.76us         1  617.76us  617.76us  617.76us  cudaHostAlloc
+                    0.01%  524.85us       604     868ns     528ns  2.2010us  cudaSetDevice
+                    0.01%  484.35us      1200     403ns     120ns  8.7620us  cudaConfigureCall
+                    0.01%  481.02us      1800     267ns      81ns     907ns  cudaGetLastError
+                    0.00%  308.11us         2  154.05us  136.54us  171.57us  cuDeviceTotalMem
+                    0.00%  103.24us         1  103.24us  103.24us  103.24us  cudaStreamCreateWithPriority
+                    0.00%  88.301us         2  44.150us  37.462us  50.839us  cuDeviceGetName
+                    0.00%  26.747us         1  26.747us  26.747us  26.747us  cudaMemsetAsync
+                    0.00%  25.943us        32     810ns     636ns  2.1950us  cudaFuncSetAttribute
+                    0.00%  15.508us         1  15.508us  15.508us  15.508us  cudaMemcpy
+                    0.00%  15.101us        25     604ns     349ns  2.2380us  cudaEventCreateWithFlags
+                    0.00%  7.0690us        26     271ns     206ns     842ns  cudaDeviceGetAttribute
+                    0.00%  2.3160us         4     579ns     193ns  1.2450us  cuDeviceGetCount
+                    0.00%  2.2090us         7     315ns     155ns     768ns  cudaGetDeviceCount
+                    0.00%  2.0890us         1  2.0890us  2.0890us  2.0890us  cudaHostGetDevicePointer
+                    0.00%  1.3720us         2     686ns     577ns     795ns  cudaFree
+                    0.00%  1.2490us         3     416ns     251ns     736ns  cuDeviceGet
+                    0.00%  1.1280us         1  1.1280us  1.1280us  1.1280us  cudaDeviceGetStreamPriorityRange
+                    0.00%     716ns         1     716ns     716ns     716ns  cuInit
+                    0.00%     350ns         1     350ns     350ns     350ns  cuDriverGetVersion
