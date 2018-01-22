@@ -30,17 +30,24 @@ torch.cuda.manual_seed(args.seed)
 
 class Net(nn.Module):
     def __init__(self):
+
         super(Net, self).__init__()
-        # input channel, output channel, filter size
-        # self.conv1 = nn.Conv2d(3, 256, kernel_size=5)
-        # self.conv2 = nn.Conv2d(256, 512, kernel_size=5)
-        # self.conv3 = nn.Conv2d(512, 512, kernel_size=5)
-        self.fc1 = nn.Linear(30000, 2000)
-        self.fc2 = nn.Linear(2000, 100)
+        # input, output, kernel
+        self.conv1 = nn.Conv2d(3, 128, kernel_size=5)
+        self.conv2 = nn.Conv2d(128, 512, kernel_size=5)
+        self.conv3 = nn.Conv2d(512, 512, kernel_size=5)
+        self.fc1 = nn.Linear(2048, 1000)
+        self.fc2 = nn.Linear(1000, 100)
 
     def forward(self, x):
-
-        x = x.view(-1, 30000)
+        # (64, 3, 128, 128)
+        x = F.relu(self.conv1(x))
+        # [64, 128, 63, 63]
+        x = F.relu(self.conv2(x))
+        # 64, 512, 14, 14
+        x = F.relu(self.conv3(x))
+        # 64 , 512, 2, 2
+        x = x.view(-1, 2048)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         return F.log_softmax(x)
@@ -77,10 +84,10 @@ def set_grad(params, params_with_grad):
 def train(epoch):
     model.train()
     # dummy dataset the same size as imagenet
-    data_ = torch.FloatTensor(np.random.randn(64, 3, 100, 100))
-    target_ = torch.FloatTensor(np.random.randint(0, 100, (64)))
+    data_ = torch.FloatTensor(np.random.randn(64, 3, 128, 128))
+    target_ = torch.FloatTensor(np.random.randint(0, 128, (64)))
     total_forward = 0
-    for batch_idx in range(10000):
+    for batch_idx in range(1000):
         if args.mixf:
             data, target = data_.cuda().half(), target_.cuda().half()
         else:
